@@ -1,0 +1,164 @@
+# This is an example configuration file that documents all the options.
+# It will need to be modified for your specific use case.
+# Please refer to the link below for more details on how to set up the configuration file
+# https://github.com/StuffAnThings/qbit_manage/wiki/Config-Setup
+
+commands:
+  # The commands defined below will IGNORE any commands used in command line and docker env variables.
+  dry_run: False
+  cross_seed: False
+  recheck: False
+  cat_update: False
+  tag_update: False
+  rem_unregistered: False
+  tag_tracker_error: False
+  rem_orphaned: False
+  tag_nohardlinks: False
+  share_limits: False
+  skip_qb_version_check: False
+  skip_cleanup: False
+
+qbt:
+  # qBittorrent parameters
+  host: qbit-media:9060
+  user: michael
+  pass: Servurb42
+
+settings:
+  force_auto_tmm: false # Will force qBittorrent to enable Automatic Torrent Management for each torrent.
+  tracker_error_tag: issue # Will set the tag of any torrents that do not have a working tracker.
+  nohardlinks_tag: noHL # Will set the tag of any torrents with no hardlinks.
+  share_limits_tag: ~share_limit # Will add this tag when applying share limits to provide an easy way to filter torrents by share limit group/priority for each torrent
+  ignoreTags_OnUpdate: # When running tag-update function, it will update torrent tags for a given torrent even if the torrent has at least one or more of the tags defined here. Otherwise torrents will not be tagged if tags exist.
+  - noHL
+  - issue
+  - cross-seed
+
+directory:
+  # Do not remove these
+  # Cross-seed var: </your/path/here/>  # Output directory of cross-seed
+  # root_dir var: </your/path/here/>  # Root downloads directory used to check for orphaned files, noHL, and RecycleBin.
+  # <OPTIONAL> remote_dir var: </your/path/here/>  # Path of docker host mapping of root_dir.
+  # remote_dir must be set if you're running qbit_manage locally and qBittorrent/cross_seed is in a docker
+  # remote_dir should not be set if qbit_manage is running in a container
+  # <OPTIONAL> recycle_bin var: </your/path/here/>   # Path of the RecycleBin folder. Default location is set to remote_dir/.RecycleBin
+  # <OPTIONAL> torrents_dir var: </your/path/here/>  # Path of the your qbittorrent torrents directory. Required for `save_torrents` attribute in recyclebin
+  # <OPTIONAL> orphaned_dir var: </your/path/here/>  # Path of the the Orphaned Data folder. This is similar to RecycleBin, but only for orphaned data.
+  # cross_seed: /storage/torrents/cross_seed/
+  root_dir: /storage/torrents/
+  remote_dir: /storage/torrents/
+  recycle_bin: /storage/torrents/.Trash-1000
+  torrents_dir: /storage/torrents/.torrents
+  orphaned_dir: /storage/torrents/orphaned_data
+
+cat:
+  # Category & Path Parameters
+  # <Category Name> : <save_path>  # Path of your save directory.
+  prowlarr: /storage/torrents/prowlarr
+  radarr: /storage/torrents/radarr
+  radarr-anime: /storage/torrents/radarr-anime
+  sonarr: /storage/torrents/sonarr
+
+nohardlinks:
+  # Tag Movies/Series that are not hard linked outside the root directory
+  # Mandatory to fill out directory parameter above to use this function (root_dir/remote_dir)
+  # This variable should be set to your category name of your completed movies/completed series in qbit. Acceptable variable can be any category you would like to tag if there are no hardlinks found
+- prowlarr
+- radarr
+- radarr-anime
+- sonarr
+- completed:
+      # <OPTIONAL> exclude_tags var: Will exclude torrents with any of the following tags when searching through the category.
+    exclude_tags:
+    - keep
+
+share_limits:
+  # Control how torrent share limits are set depending on the priority of your grouping
+  # Each torrent will be matched with the share limit group with the highest priority that meets the group filter criteria.
+  # Each torrent can only be matched with one share limit group
+  # This variable is mandatory and is a text defining the name of your grouping. This can be any string you want
+
+  keep:
+    priority: 1
+    include_all_tags:
+    - keep
+    include_any_tags:
+    - keep
+    max_ratio: -1
+    max_seeding_time: -1
+    last_active: 0
+    limit_upload_speed: 0
+    cleanup: false
+    resume_torrent_after_change: true
+    add_group_to_tag: true
+    min_num_seeds: 0
+  legacy:
+    priority: 2
+    include_any_tags:
+    - noHL
+    - cross-seed
+    max_ratio: 10
+    min_seeding_time: 0
+    last_active: 0
+    cleanup: true
+    resume_torrent_after_change: true
+    add_group_to_tag: true
+    min_num_seeds: 10
+  default:
+    priority: 999
+    max_ratio: 10
+    min_seeding_time: 43200
+    last_active: 43200
+    cleanup: false
+    resume_torrent_after_change: true
+    add_group_to_tag: true
+    min_num_seeds: 10
+
+recyclebin:
+  # Recycle Bin method of deletion will move files into the recycle bin (Located in /root_dir/.RecycleBin) instead of directly deleting them in qbit
+  # By default the Recycle Bin will be emptied on every run of the qbit_manage script if empty_after_x_days is defined.
+  enabled: true
+  # <OPTIONAL> empty_after_x_days var:
+  # Will automatically remove all files and folders in recycle bin after x days. (Checks every script run)
+  # If this variable is not defined it, the RecycleBin will never be emptied.
+  # WARNING: Setting this variable to 0 will delete all files immediately upon script run!
+  empty_after_x_days: 30
+  # <OPTIONAL> save_torrents var:
+  # If this option is set to true you MUST fill out the torrents_dir in the directory attribute.
+  # This will save a copy of your .torrent and .fastresume file in the recycle bin before deleting it from qbittorrent
+  save_torrents: false
+  # <OPTIONAL> split_by_category var:
+  # This will split the recycle bin folder by the save path defined in the `cat` attribute
+  # and add the base folder name of the recycle bin that was defined in the `recycle_bin` sub-attribute under directory.
+  split_by_category: true
+
+orphaned:
+  # Orphaned files are those in the root_dir download directory that are not referenced by any active torrents.
+  # Will automatically remove all files and folders in orphaned data after x days. (Checks every script run)
+  # If this variable is not defined it, the orphaned data will never be emptied.
+  # WARNING: Setting this variable to 0 will delete all files immediately upon script run!
+  empty_after_x_days: 30
+  # File patterns that will not be considered orphaned files. Handy for generated files that aren't part of the torrent but belong with the torrent's files
+  exclude_patterns:
+  - '**/.DS_Store'
+  - '**/Thumbs.db'
+  - '**/@eaDir'
+  - /data/torrents/temp/**
+  - '**/*.!qB'
+  - '**/*_unpackerred'
+
+webhooks:
+  error:
+  run_start:
+  run_end:
+  function:
+    cross_seed:
+    recheck:
+    cat_update:
+    tag_update:
+    rem_unregistered:
+    tag_tracker_error:
+    rem_orphaned:
+    tag_nohardlinks:
+    share_limits:
+    cleanup_dirs:

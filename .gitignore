@@ -25,7 +25,11 @@ media/lidarr/
 media/prowlarr/
 
 # qbit
-media/qbit*/
+media/qbit/
+
+# qbit
+media/qbitmanage/condig/logs
+media/qbitmanage/config/qbitmanage.log
 
 # radarr
 media/radarr*/

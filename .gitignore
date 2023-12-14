@@ -1,0 +1,48 @@
+# bazarr
+media/bazarr/config/backup
+media/bazarr/config/cache/
+media/bazarr/config/db/
+media/bazarr/config/log/
+media/bazarr/config/restore/
+media/bazarr/config/config/throttled_providers.dat
+media/bazarr/config/config/analytics_visitor_id.txt
+media/bazarr/config/config/releases.txt
+media/bazarr/config/config/announcements.json
+
+# homarr
+media/homarr/icons/
+
+# jellyfin
+media/jellyfin/
+
+# jellyseerr
+media/jellyseerr/
+
+# lidarr
+media/lidarr/
+
+# prowlarr
+media/prowlarr/
+
+# qbit
+media/qbit*/
+
+# radarr
+media/radarr*/
+
+# recyclarr
+media/recyclarr/
+
+# sonarr
+media/sonarr/
+
+#whisparr
+media/whisparr/
+
+#stash
+media/stash/
+
+shared/
+data/
+autobrr/
+
